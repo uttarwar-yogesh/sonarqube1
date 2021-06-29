@@ -1,0 +1,5 @@
+- hosts: all
+  remote_user: azureuser
+  tasks:
+    - name: deploy ssh key to account
+      authorized_key: user='azureuser' key="{{lookup('file','/home/yuttarwar/.ssh/id_rsa.pub')}}"

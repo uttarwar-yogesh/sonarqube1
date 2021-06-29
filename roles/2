@@ -1,0 +1,5 @@
+---
+- name: Java installation
+  yum:
+    name: "{{ java_version }}"
+    state: present

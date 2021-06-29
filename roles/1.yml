@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  tasks: 
+    - name: Install sonarqube
+      unarchive:
+        src: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonar_version }}.zip"
+        dest: /home/yuttarwar
+        remote_src: yes
+

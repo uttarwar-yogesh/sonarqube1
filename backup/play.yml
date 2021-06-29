@@ -1,0 +1,15 @@
+- hosts: all
+  become: yes
+  become_user: uttarwar
+  roles:
+    - role: java
+    - role: mysql
+  tasks: 
+    - name: "Run {{ item }}"
+      shell: "{{ item }}"
+      with_items:
+        - ulimit -n
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+   

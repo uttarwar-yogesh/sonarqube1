@@ -1,0 +1,30 @@
+- hosts: localhost
+  connection: local
+  vars: 
+  tasks:
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: rg-pdm-dev-001
+        name: ansibletesting
+        location: eastus2
+        vm_size: Standard_DS1_v2
+        admin_username: azureuser
+        admin_password: Password@123
+        os_type: Linux
+        image:
+        #  id: templete-image 
+          offer: RHEL
+          publisher: RedHat 
+          sku: '7.6'
+          version: latest
+      register: output
+
+    - name: Get the Instance Name and Volume id's
+      set_fact:
+        ip: "{{ output['ansible_facts'] | json_query(query) }}"
+      vars:
+        query: "azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress"
+    - debug:
+        msg: "{{ ip }}"
+
+   

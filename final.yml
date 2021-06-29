@@ -1,0 +1,52 @@
+- hosts: localhost
+  connection: local
+  vars: 
+    ip: "{{ IP }}"
+  tasks:
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: rg-pdm-dev-001
+        name: ansibletesting
+        location: eastus2
+        vm_size: Standard_DS1_v2
+        admin_username: azureuser
+        admin_password: Password@123
+        os_type: Linux
+        image:
+        #  id: templete-image 
+          offer: RHEL
+          publisher: RedHat 
+          sku: '7.6'
+          version: latest
+      register: output
+
+    - name: "Save lsof log"
+      copy:
+        content: "{{ output }}" 
+        dest: "/tmp/output.log"
+      run_once: true
+
+    - name: getting public IP 
+      shell: jq '.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress' /tmp/output.log
+      register: public_ip
+   
+    - debug: 
+        var: "{{ public_ip.stdout }}"
+      
+      register: IP
+    
+    - name: "Saving Ip details to a file"
+      copy:
+        content: "{{ IP }}"
+        dest: "ip.yml"
+      run_once: true
+    
+    - replace:
+        path: 1.yml
+        regexp: 'ip'
+        replace: "{{ IP }}"
+        backup: yes
+    
+    - name: run a playbook 
+      shell: ansible-playbook playbook.yml -i 1.yml    
+

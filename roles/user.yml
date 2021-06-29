@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: true
+  tasks: 
+   - name: Create user for sonarqube
+     user:
+      name: sonar1
+      password: upassword | password_hash('sha512')
+

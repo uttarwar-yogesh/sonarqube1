@@ -1,0 +1,38 @@
+- hosts: localhost
+  become: yes
+  #become_user: azureuser
+  #connection: local
+  #become_user: root
+  #ask_become_pass: true
+ # remote_user: azureuser
+  roles:
+  #  - role: java
+    - role: mysql
+    - role: sonar
+  tasks:
+
+#    - name: Set SSH username to ansible
+#      set_fact:
+#       ansible_ssh_user: azureuser
+#       ansible_ssh_password: Password@123
+
+    - name: "Run {{ item }}"
+      shell: "{{ item }}"
+      with_items:
+        - ulimit -n
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+    - name: Creating a file with content
+      copy:
+        dest: "/tmp/mysql.pl"
+        content: |
+          CREATE DATABASE sonarqubedb;
+          CREATE USER 'sonarqube'@'localhost' IDENTIFIED BY 'sonar';
+          GRANT ALL PRIVILEGES ON sonarqubedb.* TO 'sonarqube'@'localhost';
+          FLUSH PRIVILEGES;
+          exit
+    - name: Execute mysql comamnds
+      #shell : mysql -h localhost -u root -pPassword < /tmp/mysql.pl
+      shell : mysql < /tmp/mysql.pl
+      run_once: yes
